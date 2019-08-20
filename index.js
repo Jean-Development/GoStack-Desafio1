@@ -14,8 +14,10 @@ server.use((req, res, next) => {
 });
 
 function checkIfIdExist(req, res, next) {
-  if (!req.params.id) {
-    return res.status(400).json({ error: "ID not found" });
+  const project = projects.find(x => x.id === req.params.id);
+
+  if (!project) {
+    return res.status(400).json({ error: "Project not found" });
   }
 
   return next();
@@ -32,7 +34,7 @@ server.post("/projects", (req, res) => {
   return res.json(projects);
 });
 
-server.put("/projects/:id", (req, res) => {
+server.put("/projects/:id", checkIfIdExist, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
 
@@ -41,7 +43,7 @@ server.put("/projects/:id", (req, res) => {
   return res.json(projects);
 });
 
-server.delete("/projects/:id", (req, res) => {
+server.delete("/projects/:id", checkIfIdExist, (req, res) => {
   const { id } = req.params;
 
   projects.splice(projects.findIndex(x => x.id === id), 1);
@@ -49,7 +51,7 @@ server.delete("/projects/:id", (req, res) => {
   return res.send();
 });
 
-server.post("/projects/:id/tasks", (req, res) => {
+server.post("/projects/:id/tasks", checkIfIdExist, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
 
